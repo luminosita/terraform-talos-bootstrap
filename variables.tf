@@ -39,4 +39,10 @@ variable "nodes" {
     update        = optional(bool, false)
     igpu          = optional(bool, false)
   }))
+  validation {
+    // @formatter:off
+    condition     = length([for n in var.nodes : n if contains(["controlplane", "worker"], n.machine_type)]) == length(var.nodes)
+    error_message = "Node machine_type must be either 'controlplane' or 'worker'."
+    // @formatter:on
+  }
 }
