@@ -66,7 +66,7 @@ data "talos_machine_configuration" "this" {
         # kubelet = var.cluster.kubelet
         extra_manifests = jsonencode(var.cluster.extra_manifests)
         # api_server = var.cluster.api_server
-        inline_manifests = jsonencode(terraform_data.cilium_bootstrap_inline_manifests.output)
+        #inline_manifests = jsonencode(terraform_data.cilium_bootstrap_inline_manifests.output)
       }) : ""
   ]
 }
