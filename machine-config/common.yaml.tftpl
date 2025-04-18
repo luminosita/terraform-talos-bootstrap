@@ -6,16 +6,16 @@ machine:
     hostname: ${hostname}
     interfaces:
       - deviceSelector:
-          hardwareAddr: ${mac_address}
-%{ if ip != null }
+          hardwareAddr: ${network.mac_address}
+%{ if network.dhcp }
+        dhcp: true
+%{ else }
         addresses:
-          - ${ip}/${subnet_mask}
+          - ${network.ip}/${network.subnet_mask}
         routes:
           - network: 0.0.0.0/0
-            gateway: ${gateway}
+            gateway: ${network.gateway}
         dhcp: false
-%{ else }
-        dhcp: true
 %{ endif }
 %{ if vip != null }
         vip:

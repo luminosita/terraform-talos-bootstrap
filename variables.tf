@@ -23,14 +23,17 @@ variable "cluster" {
 variable "nodes" {
   description = "Configuration for cluster nodes"
   type = map(object({
-    host_node     = string
-    machine_type  = string
-    datastore_id  = string
-    ip            = optional(string)
-    dns           = optional(list(string))
-    mac_address   = string
-    gateway       = optional(string)
-    subnet_mask   = optional(string, "24")
+    host_node    = string
+    machine_type = string
+    datastore_id = string
+    network = object({
+      dhcp        = bool
+      ip          = optional(string)
+      dns         = optional(list(string))
+      mac_address = string
+      gateway     = optional(string)
+      subnet_mask = optional(string, "24")
+    })
     vm_id         = number
     cpu           = number
     ram_dedicated = number

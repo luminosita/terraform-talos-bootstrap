@@ -8,20 +8,20 @@ data "talos_client_configuration" "this" {
   nodes                = [for k, v in var.nodes : v.ip]
   # Don't use vip in talosconfig endpoints
   # ref - https://www.talos.dev/v1.9/talos-guides/network/vip/#caveats
-  endpoints            = [for k, v in var.nodes : v.ip if v.machine_type == "controlplane"]
+  endpoints = [for k, v in var.nodes : v.ip if v.machine_type == "controlplane"]
 }
 
 resource "terraform_data" "cilium_bootstrap_inline_manifests" {
   input = [
     {
-      name     = "cilium-bootstrap"
+      name = "cilium-bootstrap"
       contents = templatefile("${path.module}/${var.cluster.cilium.bootstrap_manifest_path}", {
-        port = var.cluster.endpoint_port
+        port    = var.cluster.endpoint_port
         version = var.cluster.cilium.version
       })
     },
     {
-      name     = "cilium-values"
+      name = "cilium-values"
       contents = yamlencode({
         apiVersion = "v1"
         kind       = "ConfigMap"
@@ -32,7 +32,7 @@ resource "terraform_data" "cilium_bootstrap_inline_manifests" {
         data = {
           "values.yaml" = templatefile("${path.root}/${var.cluster.cilium.values_file_path}", {
             cluster_name = var.cluster.name
-          })   
+          })
         }
       })
     }
@@ -40,13 +40,13 @@ resource "terraform_data" "cilium_bootstrap_inline_manifests" {
 }
 
 data "talos_machine_configuration" "this" {
-  for_each        = var.nodes
-  cluster_name    = var.cluster.name
+  for_each     = var.nodes
+  cluster_name = var.cluster.name
   # This is the Kubernetes API Server endpoint.
   # ref - https://www.talos.dev/v1.9/introduction/prodnotes/#decide-the-kubernetes-endpoint
   cluster_endpoint = "https://${var.cluster.endpoint}:${var.cluster.endpoint_port}"
   # @formatter:off
-  talos_version = var.cluster.talos_machine_config_version #!= null ? var.cluster.talos_machine_config_version : (each.value.update == true ? var.image.update_version : var.image.version)
+  talos_version      = var.cluster.talos_machine_config_version #!= null ? var.cluster.talos_machine_config_version : (each.value.update == true ? var.image.update_version : var.image.version)
   kubernetes_version = var.cluster.kubernetes_version
   # @formatter:on
   machine_type    = each.value.machine_type
@@ -56,31 +56,33 @@ data "talos_machine_configuration" "this" {
       node_name    = each.value.host_node
       cluster_name = var.cluster.region
       hostname     = each.key
-      ip           = each.value.ip
-      mac_address = lower(each.value.mac_address)
-      gateway      = each.value.gateway
-      subnet_mask  = each.value.subnet_mask
-      vip          = var.cluster.vip
+      network      = each.value.network
+      # dhcp         = each.value.dhcp
+      # ip           = each.value.ip
+      # mac_address = lower(each.value.mac_address)
+      # gateway      = each.value.gateway
+      # subnet_mask  = each.value.subnet_mask
+      vip = var.cluster.vip
     }), each.value.machine_type == "controlplane" ?
-      templatefile("${path.module}/machine-config/control-plane.yaml.tftpl", {
-        # kubelet = var.cluster.kubelet
-        extra_manifests = jsonencode(var.cluster.extra_manifests)
-        # api_server = var.cluster.api_server
-        inline_manifests = jsonencode(terraform_data.cilium_bootstrap_inline_manifests.output)
-      }) : ""
+    templatefile("${path.module}/machine-config/control-plane.yaml.tftpl", {
+      # kubelet = var.cluster.kubelet
+      extra_manifests = jsonencode(var.cluster.extra_manifests)
+      # api_server = var.cluster.api_server
+      inline_manifests = jsonencode(terraform_data.cilium_bootstrap_inline_manifests.output)
+    }) : ""
   ]
 }
 
 resource "talos_machine_configuration_apply" "this" {
-#  depends_on = [proxmox_virtual_environment_vm.this]
+  #  depends_on = [proxmox_virtual_environment_vm.this]
   for_each                    = var.nodes
   node                        = each.value.ip
   client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = data.talos_machine_configuration.this[each.key].machine_configuration
- # lifecycle {
-    # re-run config apply if vm changes
- #   replace_triggered_by = [proxmox_virtual_environment_vm.this[each.key]]
- # }
+  # lifecycle {
+  # re-run config apply if vm changes
+  #   replace_triggered_by = [proxmox_virtual_environment_vm.this[each.key]]
+  # }
 }
 
 resource "talos_machine_bootstrap" "this" {
@@ -92,7 +94,7 @@ resource "talos_machine_bootstrap" "this" {
 }
 
 data "talos_cluster_health" "this" {
-  depends_on = [ 
+  depends_on = [
     talos_machine_configuration_apply.this,
     talos_machine_bootstrap.this
   ]
@@ -107,7 +109,7 @@ data "talos_cluster_health" "this" {
 }
 
 resource "talos_cluster_kubeconfig" "this" {
-  depends_on = [ talos_machine_bootstrap.this ]
+  depends_on = [talos_machine_bootstrap.this]
   # If using VIP, it should be up by now, but to be safer retrive from one of the nodes
   # As mentioned don't use talosctl on vip
   # ref - https://www.talos.dev/v1.9/talos-guides/network/vip/#caveats
