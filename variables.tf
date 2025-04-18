@@ -1,14 +1,10 @@
 variable "cluster" {
   description = "Cluster configuration"
   type = object({
-    name          = string
-    endpoint      = string
-    endpoint_port = optional(string, "6443")
-    vip           = optional(string)
-    network = object({
-      gateway     = string
-      subnet_mask = optional(string, "24")
-    })
+    name                         = string
+    endpoint                     = string
+    endpoint_port                = optional(string, "6443")
+    vip                          = optional(string)
     talos_machine_config_version = string
     kubernetes_version           = string
     region                       = string
@@ -30,9 +26,11 @@ variable "nodes" {
     host_node     = string
     machine_type  = string
     datastore_id  = string
-    ip            = string
+    ip            = optional(string)
     dns           = optional(list(string))
     mac_address   = string
+    gateway       = optional(string)
+    subnet_mask   = optional(string, "24")
     vm_id         = number
     cpu           = number
     ram_dedicated = number

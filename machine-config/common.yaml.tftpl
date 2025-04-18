@@ -7,12 +7,16 @@ machine:
     interfaces:
       - deviceSelector:
           hardwareAddr: ${mac_address}
+%{ if ip != null }
         addresses:
           - ${ip}/${subnet_mask}
         routes:
           - network: 0.0.0.0/0
             gateway: ${gateway}
         dhcp: false
+%{ else }
+        dhcp: true
+%{ endif }
 %{ if vip != null }
         vip:
           ip: ${vip}

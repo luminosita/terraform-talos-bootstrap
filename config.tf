@@ -58,8 +58,8 @@ data "talos_machine_configuration" "this" {
       hostname     = each.key
       ip           = each.value.ip
       mac_address = lower(each.value.mac_address)
-      gateway      = var.cluster.network.gateway
-      subnet_mask  = var.cluster.network.subnet_mask
+      gateway      = each.value.gateway
+      subnet_mask  = each.value.subnet_mask
       vip          = var.cluster.vip
     }), each.value.machine_type == "controlplane" ?
       templatefile("${path.module}/machine-config/control-plane.yaml.tftpl", {
