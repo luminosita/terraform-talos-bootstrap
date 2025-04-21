@@ -69,7 +69,6 @@ data "talos_machine_configuration" "this" {
       extra_manifests = jsonencode(var.cluster.extra_manifests)
       # api_server = var.cluster.api_server
       inline_manifests = jsonencode(terraform_data.cilium_bootstrap_inline_manifests.output)
-      network          = each.value.network
     }) : ""
   ]
 }

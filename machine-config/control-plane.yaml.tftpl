@@ -9,16 +9,6 @@ cluster:
   network:
     cni:
       name: none
-%{ if network.pod_cidr != null }
-    # The pod subnet CIDR.
-    podSubnets:
-        - ${network.pod_cidr}
-%{ endif }
-%{ if network.service_cidr != null }
-    # The service subnet CIDR.
-    serviceSubnets:
-        - ${network.service_cidr}
-%{ endif }
   proxy:
     disabled: true
   discovery:
