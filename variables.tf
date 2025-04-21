@@ -33,6 +33,9 @@ variable "nodes" {
       mac_address = string
       gateway     = optional(string)
       subnet_mask = optional(string, "24")
+
+      pod_cidr     = optional(string)
+      service_cidr = optional(string)
     })
     vm_id         = number
     cpu           = number
