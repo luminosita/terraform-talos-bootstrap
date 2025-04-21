@@ -9,15 +9,15 @@ cluster:
   network:
     cni:
       name: none
-%{ if network.podCidr }
+%{ if network.pod_cidr }
     # The pod subnet CIDR.
     podSubnets:
-        - ${network.podCidr}
+        - ${network.pod_cidr}
 %{ endif }
-%{ if network.serviceCidr }
+%{ if network.service_cidr }
     # The service subnet CIDR.
     serviceSubnets:
-        - ${network.serviceCidr}
+        - ${network.service_cidr}
 %{ endif }
   proxy:
     disabled: true
