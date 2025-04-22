@@ -1,15 +1,3 @@
-cluster:
-  network:
-%{ if network.pod_cidr != null }
-    # The pod subnet CIDR.
-    podSubnets:
-        - ${network.pod_cidr}
-%{ endif }
-%{ if network.service_cidr != null }
-    # The service subnet CIDR.
-    serviceSubnets:
-        - ${network.service_cidr}
-%{ endif }
 machine:
   nodeLabels:
     topology.kubernetes.io/region: ${cluster_name}
