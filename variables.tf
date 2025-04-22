@@ -50,5 +50,5 @@ variable "nodes" {
 
 variable "vm_ip_addresses" {
   description = "Assigned VM DHCP IP addresses for cluster nodes"
-  type = optional(map(string))
+  type = map(string)
 }
