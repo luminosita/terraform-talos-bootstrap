@@ -2,7 +2,7 @@ machine:
   nodeLabels:
     topology.kubernetes.io/region: ${cluster_name}
     topology.kubernetes.io/zone: ${node_name}
-%{ if node.group != null }
+%{ if node_group != null }
     topology.kubernetes.io/group: ${node_group}
 %{ endif }
   network:
