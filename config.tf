@@ -58,10 +58,11 @@ data "talos_machine_configuration" "this" {
   config_patches = [
     templatefile("${path.module}/machine-config/common.yaml.tftpl", {
       node_name    = each.value.host_node
+      node_group   = each.value.node_group
       cluster_name = var.cluster.region
       hostname     = each.key
       network      = each.value.network
-      vip = var.cluster.vip
+      vip          = var.cluster.vip
     }), each.value.machine_type == "controlplane" ?
     templatefile("${path.module}/machine-config/control-plane.yaml.tftpl", {
       # kubelet = var.cluster.kubelet

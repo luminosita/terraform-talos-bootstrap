@@ -2,6 +2,7 @@ machine:
   nodeLabels:
     topology.kubernetes.io/region: ${cluster_name}
     topology.kubernetes.io/zone: ${node_name}
+    topology.kubernetes.io/group: ${node_group}
   network:
     hostname: ${hostname}
     interfaces:

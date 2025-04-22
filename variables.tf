@@ -24,6 +24,7 @@ variable "nodes" {
   description = "Configuration for cluster nodes"
   type = map(object({
     host_node    = string
+    node_group   = optional(string)
     machine_type = string
     datastore_id = string
     network = object({
@@ -50,5 +51,5 @@ variable "nodes" {
 
 variable "vm_ip_addresses" {
   description = "Assigned VM DHCP IP addresses for cluster nodes"
-  type = map(string)
+  type        = map(string)
 }
