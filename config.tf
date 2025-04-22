@@ -93,20 +93,21 @@ resource "talos_machine_bootstrap" "this" {
   client_configuration = talos_machine_secrets.this.client_configuration
 }
 
-data "talos_cluster_health" "this" {
-  depends_on = [
-    talos_machine_configuration_apply.this,
-    talos_machine_bootstrap.this
-  ]
-  skip_kubernetes_checks = false
-  client_configuration   = data.talos_client_configuration.this.client_configuration
-  control_plane_nodes    = [for k, v in var.nodes : local.ips[k] if v.machine_type == "controlplane"]
-  worker_nodes           = [for k, v in var.nodes : local.ips[k] if v.machine_type == "worker"]
-  endpoints              = data.talos_client_configuration.this.endpoints
-  timeouts = {
-    read = "15m"
-  }
-}
+#FIXME: Remove comment
+# data "talos_cluster_health" "this" {
+#   depends_on = [
+#     talos_machine_configuration_apply.this,
+#     talos_machine_bootstrap.this
+#   ]
+#   skip_kubernetes_checks = false
+#   client_configuration   = data.talos_client_configuration.this.client_configuration
+#   control_plane_nodes    = [for k, v in var.nodes : local.ips[k] if v.machine_type == "controlplane"]
+#   worker_nodes           = [for k, v in var.nodes : local.ips[k] if v.machine_type == "worker"]
+#   endpoints              = data.talos_client_configuration.this.endpoints
+#   timeouts = {
+#     read = "15m"
+#   }
+# }
 
 resource "talos_cluster_kubeconfig" "this" {
   depends_on = [talos_machine_bootstrap.this]
