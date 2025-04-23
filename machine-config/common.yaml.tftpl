@@ -11,6 +11,11 @@ machine:
         vip:
           ip: ${vip}
 %{ endif }
+  kubelet:
+    nodeIP:
+      # The `validSubnets` field configures the networks to pick kubelet node IP from.
+      validSubnets:
+        - 10.0.0.0/8
   # sysctls:
   #   fs.inotify.max_user_watches: 1048576   # Watchdog
   #   fs.inotify.max_user_instances: 8192    # Watchdog
