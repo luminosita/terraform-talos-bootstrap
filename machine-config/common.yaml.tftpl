@@ -16,6 +16,13 @@ machine:
       # The `validSubnets` field configures the networks to pick kubelet node IP from.
       validSubnets:
         - 10.0.0.0/8
+        - 10.0.0.0/16
+        - 10.0.0.0/24
+        - 10.0.1.0/24
+        - 10.0.2.0/24
+        - 10.0.3.0/24
+        - 192.168.20.0/24
+        - 192.168.120.0/24
   # sysctls:
   #   fs.inotify.max_user_watches: 1048576   # Watchdog
   #   fs.inotify.max_user_instances: 8192    # Watchdog
