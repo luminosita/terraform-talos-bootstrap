@@ -8,17 +8,19 @@ machine:
   network:
     hostname: ${hostname}
     interfaces:
-      - deviceSelector:
-          hardwareAddr: ${network.mac_address}
 %{ if network.dhcp }
-        dhcp: true
+      - dhcp: true
 %{ else }
+      - dhcp: false
+%{ if network.mac_address != null }
+        deviceSelector:
+          hardwareAddr: ${network.mac_address}
+%{ endif }
         addresses:
           - ${network.ip}/${network.subnet_mask}
         routes:
           - network: 0.0.0.0/0
             gateway: ${network.gateway}
-        dhcp: false
 %{ endif }
 %{ if vip != null }
         vip:

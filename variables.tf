@@ -1,8 +1,25 @@
-variable "cluster" {
+variable "talos_image" {
+  description = "Talos image configuration"
+  type = object({
+    factory_url = optional(string, "https://factory.talos.dev")
+    
+    schematic = optional(string, "schematic.yaml")
+    version  = string
+    update_schematic = optional(string, "schematic.yaml")
+    update_version = optional(string)
+
+    arch = optional(string, "amd64")
+    platform = optional(string, "nocloud")
+    image_filename_prefix = string
+
+    datastore_id     = string
+  })
+}
+
+variable "talos_cluster_config" {
   description = "Cluster configuration"
   type = object({
     name                         = string
-    endpoint                     = string
     endpoint_port                = optional(string, "6443")
     vip                          = optional(string)
     talos_machine_config_version = string
@@ -20,7 +37,7 @@ variable "cluster" {
   })
 }
 
-variable "nodes" {
+variable "talos_nodes" {
   description = "Configuration for cluster nodes"
   type = map(object({
     host_node    = string
@@ -31,9 +48,11 @@ variable "nodes" {
       dhcp        = bool
       ip          = optional(string)
       dns         = optional(list(string))
-      mac_address = string
+      mac_address = optional(string)
       gateway     = optional(string)
       subnet_mask = optional(string, "24")
+      device      = optional(string, "vmbr0")
+      vlan_id     = optional(number)
     })
     vm_id         = number
     cpu           = number
@@ -43,13 +62,8 @@ variable "nodes" {
   }))
   validation {
     // @formatter:off
-    condition     = length([for n in var.nodes : n if contains(["controlplane", "worker"], n.machine_type)]) == length(var.nodes)
+    condition     = length([for n in var.talos_nodes : n if contains(["controlplane", "worker"], n.machine_type)]) == length(var.talos_nodes)
     error_message = "Node machine_type must be either 'controlplane' or 'worker'."
     // @formatter:on
   }
-}
-
-variable "vm_ip_addresses" {
-  description = "Assigned VM DHCP IP addresses for cluster nodes"
-  type        = map(string)
 }
