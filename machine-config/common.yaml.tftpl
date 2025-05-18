@@ -1,9 +1,9 @@
 machine:
   nodeLabels:
-    topology.kubernetes.io/region: ${cluster_name}
-    topology.kubernetes.io/zone: ${node_name}
-%{ if node_group != null }
-    topology.kubernetes.io/group: ${node_group}
+    topology.kubernetes.io/region: ${region}
+    topology.kubernetes.io/zone: ${zone}
+%{ if group != null }
+    topology.kubernetes.io/group: ${group}
 %{ endif }
   network:
     hostname: ${hostname}
