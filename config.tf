@@ -12,6 +12,31 @@ locals {
     "https://github.com/kubernetes-sigs/gateway-api/releases/download/${var.talos_cluster_config.gateway_api_version}/standard-install.yaml",
     "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/${var.talos_cluster_config.gateway_api_version}/config/crd/experimental/gateway.networking.k8s.io_tlsroutes.yaml"
   ])
+
+  extra_bootstrap_manifests = var.talos_cluster_config.cilium.extra_bootstrap_manifests != null ? var.talos_cluster_config.cilium.extra_bootstrap_manifests : []
+
+  inline_manifests = concat(local.extra_bootstrap_manifests,
+    [{
+      name = "cilium-bootstrap"
+      contents = templatefile("${path.module}/inline-manifests/cilium-install.yaml.tftpl", {
+        port    = var.talos_cluster_config.endpoint_port
+        version = var.talos_cluster_config.cilium.version
+      })
+    },
+    {
+      name = "cilium-values"
+      contents = yamlencode({
+        apiVersion = "v1"
+        kind       = "ConfigMap"
+        metadata = {
+          name      = "cilium-values"
+          namespace = "kube-system"
+        }
+        data = {
+          "values.yaml" = file("${path.root}/${var.talos_cluster_config.cilium.values_file_path}")
+        }
+      })
+    }])
 }
 
 resource "talos_machine_secrets" "this" {
@@ -29,31 +54,7 @@ data "talos_client_configuration" "this" {
 }
 
 resource "terraform_data" "cilium_bootstrap_inline_manifests" {
-  input = [
-    {
-      name = "cilium-bootstrap"
-      contents = templatefile("${path.module}/${var.talos_cluster_config.cilium.bootstrap_manifest_path}", {
-        port    = var.talos_cluster_config.endpoint_port
-        version = var.talos_cluster_config.cilium.version
-      })
-    },
-    {
-      name = "cilium-values"
-      contents = yamlencode({
-        apiVersion = "v1"
-        kind       = "ConfigMap"
-        metadata = {
-          name      = "cilium-values"
-          namespace = "kube-system"
-        }
-        data = {
-          "values.yaml" = templatefile("${path.root}/${var.talos_cluster_config.cilium.values_file_path}", {
-            cluster_name = var.talos_cluster_config.name
-          })
-        }
-      })
-    }
-  ]
+  input = local.inline_manifests
 }
 
 data "talos_machine_configuration" "this" {
